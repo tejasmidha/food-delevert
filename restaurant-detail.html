@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Menu - FoodExpress</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="detail-style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                🍔 FoodExpress
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">Menu</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">My Orders</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link cart">
+                        🛒 Cart <span class="cart-count">0</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <button class="login-btn">Login</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Restaurant Header -->
+    <div class="restaurant-header">
+        <div class="restaurant-header-content">
+            <div class="restaurant-info">
+                <h1 id="restaurantName">Pizza Paradise</h1>
+                <p class="restaurant-cuisine">Italian, Fast Food, Pizzas</p>
+                <div class="restaurant-meta">
+                    <span class="meta-item">⭐ 4.5</span>
+                    <span class="meta-item">• 30-40 mins</span>
+                    <span class="meta-item">• ₹200 for two</span>
+                </div>
+                <p class="restaurant-address">📍 Vijay Nagar, Indore</p>
+            </div>
+            <div class="restaurant-header-image">
+                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600" alt="Pizza">
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Section -->
+    <div class="container">
+        <div class="menu-layout">
+            <!-- Left Side: Menu Items -->
+            <div class="menu-section">
+                <h2 class="section-title">🍕 Recommended</h2>
+                
+                <div class="menu-item">
+                    <div class="menu-item-info">
+                        <h3>Margherita Pizza</h3>
+                        <p class="item-price">₹299</p>
+                        <p class="item-description">Classic delight with 100% real mozzarella cheese</p>
+                    </div>
+                    <div class="menu-item-image">
+                        <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=200" alt="Margherita">
+                        <button class="add-btn" onclick="addToCart('Margherita Pizza', 299)">ADD</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-item-info">
+                        <h3>Pepperoni Pizza</h3>
+                        <p class="item-price">₹399</p>
+                        <p class="item-description">Loaded with spicy pepperoni and cheese</p>
+                    </div>
+                    <div class="menu-item-image">
+                        <img src="https://images.unsplash.com/photo-1628840042765-356cda07504e?w=200" alt="Pepperoni">
+                        <button class="add-btn" onclick="addToCart('Pepperoni Pizza', 399)">ADD</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-item-info">
+                        <h3>Veggie Supreme</h3>
+                        <p class="item-price">₹349</p>
+                        <p class="item-description">Loaded with fresh vegetables and olives</p>
+                    </div>
+                    <div class="menu-item-image">
+                        <img src="https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?w=200" alt="Veggie">
+                        <button class="add-btn" onclick="addToCart('Veggie Supreme', 349)">ADD</button>
+                    </div>
+                </div>
+
+                <h2 class="section-title">🥤 Beverages</h2>
+
+                <div class="menu-item">
+                    <div class="menu-item-info">
+                        <h3>Coca Cola</h3>
+                        <p class="item-price">₹50</p>
+                        <p class="item-description">Chilled soft drink</p>
+                    </div>
+                    <div class="menu-item-image">
+                        <img src="https://images.unsplash.com/photo-1554866585-cd94860890b7?w=200" alt="Coke">
+                        <button class="add-btn" onclick="addToCart('Coca Cola', 50)">ADD</button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-item-info">
+                        <h3>Fresh Lemonade</h3>
+                        <p class="item-price">₹60</p>
+                        <p class="item-description">Freshly squeezed lemon with mint</p>
+                    </div>
+                    <div class="menu-item-image">
+                        <img src="https://images.unsplash.com/photo-1523677011781-c91d1bbe2f0f?w=200" alt="Lemonade">
+                        <button class="add-btn" onclick="addToCart('Fresh Lemonade', 60)">ADD</button>
+                    </div>
+                </div>
+
+                <h2 class="section-title">🍰 Desserts</h2>
+
+                <div class="menu-item">
+                    <div class="menu-item-info">
+                        <h3>Chocolate Lava Cake</h3>
+                        <p class="item-price">₹149</p>
+                        <p class="item-description">Warm chocolate cake with molten center</p>
+                    </div>
+                    <div class="menu-item-image">
+                        <img src="https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=200" alt="Lava Cake">
+                        <button class="add-btn" onclick="addToCart('Chocolate Lava Cake', 149)">ADD</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Cart Summary (Sticky) -->
+            <div class="cart-summary">
+                <h3>🛒 Your Cart</h3>
+                <div id="cartItems">
+                    <p class="empty-cart">Your cart is empty</p>
+                </div>
+                <div id="cartTotal" class="cart-total hidden">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <span id="subtotal">₹0</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Delivery Fee</span>
+                        <span>₹40</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span>Total</span>
+                        <span id="grandTotal">₹40</span>
+                    </div>
+                    <button class="checkout-btn">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-column">
+                <h3>🍔 FoodExpress</h3>
+                <p>Your favorite food, delivered fast to your doorstep.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 FoodExpress. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="cart.js"></script>
+</body>
+</html>
