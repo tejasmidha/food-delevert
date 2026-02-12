@@ -1,6 +1,19 @@
 // Cart array to store items
 let cart = [];
 
+// Load cart from localStorage when page loads
+function loadCart() {
+    const savedCart = localStorage.getItem('foodDeliveryCart');
+    if (savedCart) {
+        cart = JSON.parse(savedCart);
+    }
+}
+
+// Save cart to localStorage
+function saveCart() {
+    localStorage.setItem('foodDeliveryCart', JSON.stringify(cart));
+}
+
 // Add item to cart
 function addToCart(itemName, itemPrice) {
     // Check if item already exists in cart
@@ -16,16 +29,17 @@ function addToCart(itemName, itemPrice) {
         });
     }
     
+    saveCart(); // Save to localStorage
     updateCart();
-    
-    // Show feedback
-    showAddedToCartMessage(itemName);
+    showToast(`${itemName} added to cart! 🎉`);
 }
 
 // Remove item from cart
 function removeFromCart(itemName) {
     cart = cart.filter(item => item.name !== itemName);
+    saveCart(); // Save to localStorage
     updateCart();
+    showToast(`${itemName} removed from cart`);
 }
 
 // Update quantity
@@ -38,8 +52,19 @@ function updateQuantity(itemName, change) {
         if (item.quantity <= 0) {
             removeFromCart(itemName);
         } else {
+            saveCart(); // Save to localStorage
             updateCart();
         }
+    }
+}
+
+// Clear entire cart
+function clearCart() {
+    if (confirm('Are you sure you want to clear your cart?')) {
+        cart = [];
+        saveCart();
+        updateCart();
+        showToast('Cart cleared!');
     }
 }
 
@@ -54,8 +79,12 @@ function updateCart() {
     
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
-        cartTotalContainer.classList.add('hidden');
-        cartCountBadge.textContent = '0';
+        if (cartTotalContainer) {
+            cartTotalContainer.style.display = 'none';
+        }
+        if (cartCountBadge) {
+            cartCountBadge.textContent = '0';
+        }
         return;
     }
     
@@ -65,7 +94,7 @@ function updateCart() {
             <div class="cart-item">
                 <div class="cart-item-info">
                     <h4>${item.name}</h4>
-                    <p class="cart-item-price">₹${item.price}</p>
+                    <p class="cart-item-price">₹${item.price} × ${item.quantity}</p>
                 </div>
                 <div class="cart-item-controls">
                     <button class="quantity-btn" onclick="updateQuantity('${item.name}', -1)">-</button>
@@ -79,28 +108,158 @@ function updateCart() {
     
     // Calculate totals
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const deliveryFee = 40;
+    const deliveryFee = subtotal > 0 ? 40 : 0;
     const grandTotal = subtotal + deliveryFee;
     
     // Update totals
-    document.getElementById('subtotal').textContent = `₹${subtotal}`;
-    document.getElementById('grandTotal').textContent = `₹${grandTotal}`;
+    const subtotalElement = document.getElementById('subtotal');
+    const grandTotalElement = document.getElementById('grandTotal');
+    
+    if (subtotalElement) {
+        subtotalElement.textContent = `₹${subtotal}`;
+    }
+    if (grandTotalElement) {
+        grandTotalElement.textContent = `₹${grandTotal}`;
+    }
     
     // Show cart total section
-    cartTotalContainer.classList.remove('hidden');
+    if (cartTotalContainer) {
+        cartTotalContainer.style.display = 'block';
+    }
     
     // Update cart count badge
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartCountBadge.textContent = totalItems;
+    if (cartCountBadge) {
+        cartCountBadge.textContent = totalItems;
+    }
 }
 
-// Show added to cart message
-function showAddedToCartMessage(itemName) {
-    // You can enhance this with a toast notification later
-    console.log(`Added ${itemName} to cart!`);
+// Show toast notification
+function showToast(message) {
+    // Remove any existing toast
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // Show toast
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+    
+    // Hide and remove toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+
+// Show checkout modal
+function showCheckout() {
+    if (cart.length === 0) {
+        showToast('Your cart is empty!');
+        return;
+    }
+    
+    const modal = document.getElementById('checkoutModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        updateOrderSummary();
+    }
+}
+
+// Close checkout modal
+function closeCheckout() {
+    const modal = document.getElementById('checkoutModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Update order summary in modal
+function updateOrderSummary() {
+    const summaryContainer = document.getElementById('orderSummary');
+    if (!summaryContainer) return;
+    
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const deliveryFee = 40;
+    const grandTotal = subtotal + deliveryFee;
+    
+    let itemsHTML = '';
+    cart.forEach(item => {
+        itemsHTML += `
+            <div class="summary-item">
+                <span>${item.name} × ${item.quantity}</span>
+                <span>₹${item.price * item.quantity}</span>
+            </div>
+        `;
+    });
+    
+    summaryContainer.innerHTML = `
+        ${itemsHTML}
+        <div class="summary-divider"></div>
+        <div class="summary-item">
+            <span>Subtotal</span>
+            <span>₹${subtotal}</span>
+        </div>
+        <div class="summary-item">
+            <span>Delivery Fee</span>
+            <span>₹${deliveryFee}</span>
+        </div>
+        <div class="summary-item summary-total">
+            <span>Total</span>
+            <span>₹${grandTotal}</span>
+        </div>
+    `;
+}
+
+// Place order
+function placeOrder() {
+    const name = document.getElementById('customerName').value;
+    const phone = document.getElementById('customerPhone').value;
+    const address = document.getElementById('customerAddress').value;
+    
+    if (!name || !phone || !address) {
+        showToast('Please fill all delivery details!');
+        return;
+    }
+    
+    // Simulate order placement
+    showToast('🎉 Order placed successfully!');
+    
+    // Clear cart
+    cart = [];
+    saveCart();
+    updateCart();
+    
+    // Close modal
+    closeCheckout();
+    
+    // Clear form
+    document.getElementById('customerName').value = '';
+    document.getElementById('customerPhone').value = '';
+    document.getElementById('customerAddress').value = '';
+    
+    // In a real app, you would send this to a backend server
+    console.log('Order placed:', { name, phone, address, items: cart });
 }
 
 // Initialize cart on page load
 document.addEventListener('DOMContentLoaded', function() {
-    updateCart();
+    loadCart(); // Load saved cart
+    updateCart(); // Update display
+    
+    // Add event listener to checkout button if it exists
+    const checkoutBtn = document.querySelector('.checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', showCheckout);
+    }
 });

@@ -142,10 +142,11 @@
             <!-- Right Side: Cart Summary (Sticky) -->
             <div class="cart-summary">
                 <h3>🛒 Your Cart</h3>
+                <button class="clear-cart-btn" onclick="clearCart()">Clear Cart</button>
                 <div id="cartItems">
                     <p class="empty-cart">Your cart is empty</p>
                 </div>
-                <div id="cartTotal" class="cart-total hidden">
+                <div id="cartTotal" class="cart-total" style="display: none;">
                     <div class="total-row">
                         <span>Subtotal</span>
                         <span id="subtotal">₹0</span>
@@ -160,6 +161,30 @@
                     </div>
                     <button class="checkout-btn">Proceed to Checkout</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Checkout</h2>
+                <span class="close" onclick="closeCheckout()">&times;</span>
+            </div>
+            
+            <div class="modal-body">
+                <h3>Delivery Details</h3>
+                <form id="checkoutForm" onsubmit="event.preventDefault();">
+                    <input type="text" id="customerName" placeholder="Your Name" required>
+                    <input type="tel" id="customerPhone" placeholder="Phone Number" required>
+                    <textarea id="customerAddress" placeholder="Delivery Address" rows="3" required></textarea>
+                </form>
+                
+                <h3>Order Summary</h3>
+                <div id="orderSummary"></div>
+                
+                <button class="place-order-btn" onclick="placeOrder()">Place Order</button>
             </div>
         </div>
     </div>
