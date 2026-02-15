@@ -1,189 +1,143 @@
-// Your Firebase configuration (from the image you showed)
-const firebaseConfig = {
-  apiKey: "AIzaSyD69mFKGWOjHZwLa8wGexGXv3b_d7UF48g",
-  authDomain: "food-delivery-app-a7512.firebaseapp.com",
-  projectId: "food-delivery-app-a7512",
-  storageBucket: "food-delivery-app-a7512.firebasestorage.app",
-  messagingSenderId: "803950081326",
-  appId: "1:803950081326:web:365eb53d1820f2a0a776bf",
-  measurementId: "G-J5EBP7SLCW"
-};
-
-// Initialize Firebase (will be loaded from CDN)
-let auth;
-let currentUser = null;
-
-// Wait for Firebase to load
-window.addEventListener('load', function() {
-    if (typeof firebase !== 'undefined') {
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        auth = firebase.auth();
-        
-        // Listen for auth state changes
-        auth.onAuthStateChanged(function(user) {
-            currentUser = user;
-            updateUIForUser(user);
-            
-            if (user) {
-                console.log('User logged in:', user.email);
-                // Load user's cart
-                loadUserCart();
-            } else {
-                console.log('User logged out');
-            }
-        });
-    }
-});
-
-// Show login modal
-function showLoginModal() {
-    const modal = document.getElementById('loginModal');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
+/* Login Modal Styles */
+#loginModal {
+    display: none !important;
 }
 
-// Close login modal
-function closeLoginModal() {
-    const modal = document.getElementById('loginModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
+#loginModal.modal {
+    display: flex !important;
+    position: fixed;
+    z-index: 99999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
 }
 
-// Google Sign In
-function signInWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider)
-        .then((result) => {
-            showToast('Welcome ' + result.user.displayName + '! 🎉');
-            closeLoginModal();
-        })
-        .catch((error) => {
-            showToast('Login failed: ' + error.message);
-        });
+.login-modal-content {
+    max-width: 450px;
+    background-color: white;
+    border-radius: 12px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
 
-// Email/Password Sign Up
-function signUpWithEmail() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    
-    if (!email || !password) {
-        showToast('Please enter email and password');
-        return;
-    }
-    
-    if (password.length < 6) {
-        showToast('Password must be at least 6 characters');
-        return;
-    }
-    
-    auth.createUserWithEmailAndPassword(email, password)
-        .then((result) => {
-            showToast('Account created! Welcome! 🎉');
-            closeLoginModal();
-        })
-        .catch((error) => {
-            // If user already exists, try to sign in instead
-            if (error.code === 'auth/email-already-in-use') {
-                signInWithEmail();
-            } else {
-                showToast('Sign up failed: ' + error.message);
-            }
-        });
+.google-signin-btn {
+    width: 100%;
+    background-color: white;
+    border: 2px solid #ddd;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
 }
 
-// Email/Password Sign In
-function signInWithEmail() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    
-    if (!email || !password) {
-        showToast('Please enter email and password');
-        return;
-    }
-    
-    auth.signInWithEmailAndPassword(email, password)
-        .then((result) => {
-            showToast('Welcome back! 🎉');
-            closeLoginModal();
-        })
-        .catch((error) => {
-            showToast('Login failed: ' + error.message);
-        });
+.google-signin-btn:hover {
+    border-color: #4285f4;
+    background-color: #f8f9fa;
 }
 
-// Logout
-function logout() {
-    auth.signOut()
-        .then(() => {
-            showToast('Logged out successfully');
-            // Clear cart
-            cart = [];
-            saveCart();
-            updateCart();
-        })
-        .catch((error) => {
-            showToast('Logout failed: ' + error.message);
-        });
+.google-signin-btn img {
+    width: 20px;
+    height: 20px;
 }
 
-// Update UI based on user state
-function updateUIForUser(user) {
-    const loginBtn = document.querySelector('.login-btn');
-    
-    if (user) {
-        // User is logged in
-        if (loginBtn) {
-            loginBtn.textContent = user.displayName || user.email.split('@')[0];
-            loginBtn.onclick = showUserMenu;
-        }
-    } else {
-        // User is logged out
-        if (loginBtn) {
-            loginBtn.textContent = 'Login';
-            loginBtn.onclick = showLoginModal;
-        }
-    }
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
 }
 
-// Show user menu
-function showUserMenu() {
-    const userMenuHTML = `
-        <div class="user-menu-dropdown">
-            <p><strong>${currentUser.displayName || currentUser.email}</strong></p>
-            <button onclick="logout()">Logout</button>
-        </div>
-    `;
-    
-    // Simple implementation - you can enhance this
-    if (confirm('Logout?')) {
-        logout();
-    }
+.divider::before,
+.divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background-color: #ddd;
 }
 
-// Load user-specific cart
-function loadUserCart() {
-    if (currentUser) {
-        const userCartKey = 'foodDeliveryCart_' + currentUser.uid;
-        const savedCart = localStorage.getItem(userCartKey);
-        if (savedCart) {
-            cart = JSON.parse(savedCart);
-            updateCart();
-        }
-    }
+.divider::before {
+    left: 0;
 }
 
-// Override saveCart to save per user
-const originalSaveCart = window.saveCart;
-window.saveCart = function() {
-    if (currentUser) {
-        const userCartKey = 'foodDeliveryCart_' + currentUser.uid;
-        localStorage.setItem(userCartKey, JSON.stringify(cart));
-    } else {
-        // If not logged in, save to generic key
-        localStorage.setItem('foodDeliveryCart', JSON.stringify(cart));
-    }
-};
+.divider::after {
+    right: 0;
+}
+
+.divider span {
+    background-color: white;
+    padding: 0 15px;
+    color: #888;
+    font-size: 14px;
+}
+
+#loginForm input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+#loginForm input:focus {
+    outline: none;
+    border-color: #ff6347;
+}
+
+.login-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.login-submit-btn,
+.signup-submit-btn {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.login-submit-btn {
+    background-color: #ff6347;
+    color: white;
+}
+
+.login-submit-btn:hover {
+    background-color: #ff4520;
+}
+
+.signup-submit-btn {
+    background-color: white;
+    color: #ff6347;
+    border: 2px solid #ff6347;
+}
+
+.signup-submit-btn:hover {
+    background-color: #fff5f3;
+}
+
+.login-note {
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+    margin-top: 15px;
+}

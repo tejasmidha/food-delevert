@@ -25,7 +25,7 @@
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link cart">
-                        🛒 Cart <span class="cart-count">3</span>
+                        🛒 Cart <span class="cart-count">0</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -63,8 +63,6 @@
                 <button class="chip" data-filter="healthy">🥗 Healthy</button>
             </div>
         </div>
-        
-        <div class="restaurant-grid">
         
         <div class="restaurant-grid">
             <!-- Restaurant Card 1 -->
@@ -152,14 +150,10 @@
             </div>
         </div>
     </div>
-</body>
-<script src="script.js"></script>
-</body>
-</html>
-<!-- Footer -->
+
+    <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
-            <!-- Column 1: About -->
             <div class="footer-column">
                 <h3>🍔 FoodExpress</h3>
                 <p>Your favorite food, delivered fast to your doorstep. Order from the best restaurants in your area.</p>
@@ -171,7 +165,6 @@
                 </div>
             </div>
 
-            <!-- Column 2: Quick Links -->
             <div class="footer-column">
                 <h4>Quick Links</h4>
                 <ul class="footer-links">
@@ -183,7 +176,6 @@
                 </ul>
             </div>
 
-            <!-- Column 3: For Restaurants -->
             <div class="footer-column">
                 <h4>For Restaurants</h4>
                 <ul class="footer-links">
@@ -194,7 +186,6 @@
                 </ul>
             </div>
 
-            <!-- Column 4: Contact Info -->
             <div class="footer-column">
                 <h4>Contact Us</h4>
                 <ul class="footer-contact">
@@ -206,7 +197,6 @@
             </div>
         </div>
 
-        <!-- Bottom Bar -->
         <div class="footer-bottom">
             <p>&copy; 2026 FoodExpress. All rights reserved.</p>
             <div class="footer-bottom-links">
@@ -216,17 +206,9 @@
             </div>
         </div>
     </footer>
-    <!-- Firebase CDN -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    
-    <!-- Firebase Auth -->
-    <script src="firebase-auth.js"></script>
-    
-    <script src="script.js"></script>
 
-<!-- Login Modal -->
-    <div id="loginModal" class="modal">
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal" style="display: none;">
         <div class="modal-content login-modal-content">
             <div class="modal-header">
                 <h2>Login / Sign Up</h2>
@@ -264,11 +246,142 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
-    <!-- Firebase Auth -->
-    <script src="firebase-auth.js"></script>
+    <!-- Firebase Auth Code Inline -->
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyD69mFKGWOjHZwLa8wGexGXv3b_d7UF48g",
+          authDomain: "food-delivery-app-a7512.firebaseapp.com",
+          projectId: "food-delivery-app-a7512",
+          storageBucket: "food-delivery-app-a7512.firebasestorage.app",
+          messagingSenderId: "803950081326",
+          appId: "1:803950081326:web:365eb53d1820f2a0a776bf",
+          measurementId: "G-J5EBP7SLCW"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        let currentUser = null;
+
+        // Auth state listener
+        auth.onAuthStateChanged(function(user) {
+            currentUser = user;
+            const loginBtn = document.querySelector('.login-btn');
+            
+            if (user) {
+                console.log('User logged in:', user.email);
+                if (loginBtn) {
+                    const displayName = user.displayName || user.email.split('@')[0];
+                    loginBtn.textContent = displayName.length > 15 ? displayName.substring(0, 15) + '...' : displayName;
+                    loginBtn.onclick = function() {
+                        if (confirm('Logout from ' + displayName + '?')) {
+                            logout();
+                        }
+                    };
+                }
+            } else {
+                console.log('User logged out');
+                if (loginBtn) {
+                    loginBtn.textContent = 'Login';
+                    loginBtn.onclick = showLoginModal;
+                }
+            }
+        });
+
+        // Show login modal
+        function showLoginModal() {
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        // Close login modal
+        function closeLoginModal() {
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Google Sign In
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    alert('Welcome ' + result.user.displayName + '! 🎉');
+                    closeLoginModal();
+                })
+                .catch((error) => {
+                    alert('Login failed: ' + error.message);
+                    console.error('Google login error:', error);
+                });
+        }
+
+        // Email/Password Sign Up
+        function signUpWithEmail() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                alert('Please enter email and password');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+            }
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((result) => {
+                    alert('Account created! Welcome! 🎉');
+                    closeLoginModal();
+                })
+                .catch((error) => {
+                    if (error.code === 'auth/email-already-in-use') {
+                        signInWithEmail();
+                    } else {
+                        alert('Sign up failed: ' + error.message);
+                        console.error('Sign up error:', error);
+                    }
+                });
+        }
+
+        // Email/Password Sign In
+        function signInWithEmail() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                alert('Please enter email and password');
+                return;
+            }
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((result) => {
+                    alert('Welcome back! 🎉');
+                    closeLoginModal();
+                })
+                .catch((error) => {
+                    alert('Login failed: ' + error.message);
+                    console.error('Login error:', error);
+                });
+        }
+
+        // Logout
+        function logout() {
+            auth.signOut()
+                .then(() => {
+                    alert('Logged out successfully');
+                })
+                .catch((error) => {
+                    alert('Logout failed: ' + error.message);
+                });
+        }
+    </script>
     
     <script src="script.js"></script>
 </body>
-</html>    
-
-
+</html>
