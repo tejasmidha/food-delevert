@@ -212,5 +212,51 @@
     <script src="firebase-auth.js"></script>
     
     <script src="cart.js"></script>
+
+
+<!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content login-modal-content">
+            <div class="modal-header">
+                <h2>Login / Sign Up</h2>
+                <span class="close" onclick="closeLoginModal()">&times;</span>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Google Sign In Button -->
+                <button class="google-signin-btn" onclick="signInWithGoogle()">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                    Continue with Google
+                </button>
+                
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+                
+                <!-- Email/Password Form -->
+                <form id="loginForm" onsubmit="event.preventDefault();">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                    <input type="password" id="loginPassword" placeholder="Password (min 6 characters)" required>
+                    
+                    <div class="login-buttons">
+                        <button type="button" class="login-submit-btn" onclick="signInWithEmail()">Login</button>
+                        <button type="button" class="signup-submit-btn" onclick="signUpWithEmail()">Sign Up</button>
+                    </div>
+                </form>
+                
+                <p class="login-note">By continuing, you agree to our Terms of Service and Privacy Policy</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Firebase Auth -->
+    <script src="firebase-auth.js"></script>
+    
+    <script src="cart.js"></script>
 </body>
 </html>    
+  
