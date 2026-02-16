@@ -217,14 +217,7 @@
             
             <div class="modal-body">
                 <!-- Google Sign In Button -->
-                <button class="google-signin-btn" onclick="signInWithGoogle()">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-                    Continue with Google
-                </button>
                 
-                <div class="divider">
-                    <span>OR</span>
-                </div>
                 
                 <!-- Email/Password Form -->
                 <form id="loginForm" onsubmit="event.preventDefault();">
@@ -242,146 +235,37 @@
         </div>
     </div>
 
-    <!-- Firebase CDN -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    
-    <!-- Firebase Auth Code Inline -->
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-          apiKey: "AIzaSyD69mFKGWOjHZwLa8wGexGXv3b_d7UF48g",
-          authDomain: "food-delivery-app-a7512.firebaseapp.com",
-          projectId: "food-delivery-app-a7512",
-          storageBucket: "food-delivery-app-a7512.firebasestorage.app",
-          messagingSenderId: "803950081326",
-          appId: "1:803950081326:web:365eb53d1820f2a0a776bf",
-          measurementId: "G-J5EBP7SLCW"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        let currentUser = null;
-
-        // Auth state listener
-        auth.onAuthStateChanged(function(user) {
-            currentUser = user;
-            const loginBtn = document.querySelector('.login-btn');
+<!-- Login Modal -->
+    <div id="loginModal" class="modal" style="display: none;">
+        <div class="modal-content login-modal-content">
+            <div class="modal-header">
+                <h2>Login / Sign Up</h2>
+                <span class="close" onclick="closeLoginModal()">&times;</span>
+            </div>
             
-            if (user) {
-                console.log('User logged in:', user.email);
-                if (loginBtn) {
-                    const displayName = user.displayName || user.email.split('@')[0];
-                    loginBtn.textContent = displayName.length > 15 ? displayName.substring(0, 15) + '...' : displayName;
-                    loginBtn.onclick = function() {
-                        if (confirm('Logout from ' + displayName + '?')) {
-                            logout();
-                        }
-                    };
-                }
-            } else {
-                console.log('User logged out');
-                if (loginBtn) {
-                    loginBtn.textContent = 'Login';
-                    loginBtn.onclick = showLoginModal;
-                }
-            }
-        });
+            <div class="modal-body">
+                <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+                    Create an account or login to save your orders and cart
+                </p>
+                
+                <!-- Email/Password Form -->
+                <form id="loginForm" onsubmit="event.preventDefault();">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                    <input type="password" id="loginPassword" placeholder="Password (min 6 characters)" required>
+                    
+                    <div class="login-buttons">
+                        <button type="button" class="login-submit-btn" onclick="signInWithEmail()">Login</button>
+                        <button type="button" class="signup-submit-btn" onclick="signUpWithEmail()">Sign Up</button>
+                    </div>
+                </form>
+                
+                <p class="login-note">Your data is stored locally in your browser</p>
+            </div>
+        </div>
+    </div>
 
-        // Show login modal
-        function showLoginModal() {
-            const modal = document.getElementById('loginModal');
-            if (modal) {
-                modal.style.display = 'flex';
-            }
-        }
-
-        // Close login modal
-        function closeLoginModal() {
-            const modal = document.getElementById('loginModal');
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        // Google Sign In
-        function signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    alert('Welcome ' + result.user.displayName + '! 🎉');
-                    closeLoginModal();
-                })
-                .catch((error) => {
-                    alert('Login failed: ' + error.message);
-                    console.error('Google login error:', error);
-                });
-        }
-
-        // Email/Password Sign Up
-        function signUpWithEmail() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!email || !password) {
-                alert('Please enter email and password');
-                return;
-            }
-            
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters');
-                return;
-            }
-            
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((result) => {
-                    alert('Account created! Welcome! 🎉');
-                    closeLoginModal();
-                })
-                .catch((error) => {
-                    if (error.code === 'auth/email-already-in-use') {
-                        signInWithEmail();
-                    } else {
-                        alert('Sign up failed: ' + error.message);
-                        console.error('Sign up error:', error);
-                    }
-                });
-        }
-
-        // Email/Password Sign In
-        function signInWithEmail() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!email || !password) {
-                alert('Please enter email and password');
-                return;
-            }
-            
-            auth.signInWithEmailAndPassword(email, password)
-                .then((result) => {
-                    alert('Welcome back! 🎉');
-                    closeLoginModal();
-                })
-                .catch((error) => {
-                    alert('Login failed: ' + error.message);
-                    console.error('Login error:', error);
-                });
-        }
-
-        // Logout
-        function logout() {
-            auth.signOut()
-                .then(() => {
-                    alert('Logged out successfully');
-                })
-                .catch((error) => {
-                    alert('Logout failed: ' + error.message);
-                });
-        }
-    </script>
-    
+    <!-- Simple Auth System (No Firebase!) -->
+    <script src="auth.js"></script>
     <script src="script.js"></script>
 </body>
-</html>
+</html>   
